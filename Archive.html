@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Vesta | Archive</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+body { margin:0; background:#f8f9fa; }
+.sidebar {
+  width:260px; background:#1f4e8c; color:#fff;
+  position:fixed; top:0; bottom:0; padding:20px;
+}
+.nav-link { cursor:pointer; padding:8px 0; }
+.main { margin-left:260px; min-height:100vh; }
+.topbar { background:#243f63; color:#fff; padding:15px; text-align:center; }
+.topbar h1 { font-family:'Great Vibes', cursive; font-size:48px; margin:0; }
+.content { padding:25px; background:#fff; min-height:calc(100vh - 120px); }
+.archive-cards { display:flex; gap:20px; margin-top:20px; }
+.card-btn {
+  background:#d9d9d9; padding:20px 30px; border-radius:8px;
+  cursor:pointer; display:flex; align-items:center; gap:15px;
+}
+.circle { width:32px; height:32px; background:#fff; border-radius:50%; }
+.hidden { display:none; }
+table th, table td { font-size:14px; }
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar d-flex flex-column">
+  <div class="text-center mb-4">
+    <div class="rounded-circle bg-white mx-auto mb-2" style="width:70px;height:70px;"></div>
+    <strong>LN, FN MI.</strong><br>
+    <small>LANDLORD</small>
+  </div>
+
+  <a class="nav-link text-white">Dashboard</a>
+  <a class="nav-link text-white">Tenants</a>
+  <a class="nav-link text-white">Rooms</a>
+  <a class="nav-link text-white">Payments</a>
+  <a class="nav-link text-white fw-bold" onclick="showArchiveMenu()">Archive</a>
+  <a class="nav-link text-white">Settings</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar"><h1>Vesta</h1></div>
+
+  <div class="content">
+    <h5 id="breadcrumb">Archive</h5>
+
+    <!-- ARCHIVE MENU -->
+    <div id="archiveMenu" class="archive-cards">
+      <div class="card-btn" onclick="showPastTenants()"><div class="circle"></div>Past Tenants</div>
+      <div class="card-btn" onclick="showPayments()"><div class="circle"></div>Payment History</div>
+      <div class="card-btn" onclick="showIssues()"><div class="circle"></div>Issue Reports</div>
+    </div>
+
+    <!-- PAST TENANTS -->
+    <div id="pastTenants" class="hidden">
+      <button class="btn btn-outline-secondary btn-sm mb-3" onclick="showArchiveMenu()">← Back</button>
+      <h6>Archive &gt; Past Tenants</h6>
+
+      <input class="form-control mb-2" placeholder="Search..."
+             onkeyup="searchTable('tenantTable', this.value)">
+
+      <table class="table table-bordered" id="tenantTable">
+        <thead>
+          <tr>
+            <th>ID</th><th>Name</th><th>Room</th><th>Contact</th><th>Status</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>TN-002</td><td>Dani Soriano</td><td>A-101</td>
+            <td>09876543210</td><td>Moved Out</td>
+            <td><button class="btn btn-success btn-sm" onclick="openEditModal(this)">Edit</button></td>
+          </tr>
+          <tr>
+            <td>TN-003</td><td>Juan Dela Cruz</td><td>B-202</td>
+            <td>09123456789</td><td>Moved Out</td>
+            <td><button class="btn btn-success btn-sm" onclick="openEditModal(this)">Edit</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PAYMENT HISTORY -->
+    <div id="paymentHistory" class="hidden">
+      <button class="btn btn-outline-secondary btn-sm mb-3" onclick="showArchiveMenu()">← Back</button>
+      <h6>Archive &gt; Payment History</h6>
+
+      <div class="d-flex gap-2 mb-2">
+        <input class="form-control" placeholder="Search..."
+               onkeyup="searchTable('paymentTable', this.value)">
+        <button class="btn btn-secondary btn-sm">Month</button>
+        <button class="btn btn-secondary btn-sm">Year</button>
+      </div>
+
+      <table class="table table-bordered" id="paymentTable">
+        <thead>
+          <tr>
+            <th>ID</th><th>Tenant</th><th>Room</th>
+            <th>Amount</th><th>Month</th><th>Year</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>PM-001</td><td>Dani Soriano</td><td>A-101</td>
+            <td>₱3,500</td><td>January</td><td>2025</td><td>Paid</td>
+          </tr>
+          <tr>
+            <td>PM-002</td><td>Juan Dela Cruz</td><td>B-202</td>
+            <td>₱4,000</td><td>February</td><td>2025</td><td>Paid</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ISSUE REPORTS -->
+    <div id="issueReports" class="hidden">
+      <button class="btn btn-outline-secondary btn-sm mb-3" onclick="showArchiveMenu()">← Back</button>
+      <h6>Archive &gt; Issue Reports</h6>
+
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th><th>Tenant</th><th>Room</th><th>Issue</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>IR-001</td><td>Dani Soriano</td><td>A-101</td>
+            <td>Broken Light</td><td>Resolved</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5>Edit Tenant</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input class="form-control mb-2" id="editName">
+        <input class="form-control mb-2" id="editRoom">
+        <input class="form-control mb-2" id="editContact">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEdit()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const archiveMenu = document.getElementById("archiveMenu");
+const pastTenants = document.getElementById("pastTenants");
+const paymentHistory = document.getElementById("paymentHistory");
+const issueReports = document.getElementById("issueReports");
+const breadcrumb = document.getElementById("breadcrumb");
+let selectedRow = null;
+
+function hideAll() {
+  archiveMenu.style.display = "none";
+  pastTenants.classList.add("hidden");
+  paymentHistory.classList.add("hidden");
+  issueReports.classList.add("hidden");
+}
+
+function showArchiveMenu() {
+  hideAll();
+  archiveMenu.style.display = "flex";
+  breadcrumb.innerText = "Archive";
+}
+
+function showPastTenants() {
+  hideAll();
+  pastTenants.classList.remove("hidden");
+  breadcrumb.innerText = "Archive > Past Tenants";
+}
+
+function showPayments() {
+  hideAll();
+  paymentHistory.classList.remove("hidden");
+  breadcrumb.innerText = "Archive > Payment History";
+}
+
+function showIssues() {
+  hideAll();
+  issueReports.classList.remove("hidden");
+  breadcrumb.innerText = "Archive > Issue Reports";
+}
+
+function searchTable(tableId, query) {
+  query = query.toLowerCase();
+  document.querySelectorAll(`#${tableId} tbody tr`).forEach(row => {
+    row.style.display = row.innerText.toLowerCase().includes(query) ? "" : "none";
+  });
+}
+
+function openEditModal(btn) {
+  selectedRow = btn.closest("tr");
+  editName.value = selectedRow.cells[1].innerText;
+  editRoom.value = selectedRow.cells[2].innerText;
+  editContact.value = selectedRow.cells[3].innerText;
+  new bootstrap.Modal(editModal).show();
+}
+
+function saveEdit() {
+  selectedRow.cells[1].innerText = editName.value;
+  selectedRow.cells[2].innerText = editRoom.value;
+  selectedRow.cells[3].innerText = editContact.value;
+  bootstrap.Modal.getInstance(editModal).hide();
+}
+
+showArchiveMenu();
+</script>
+
+</body>
+</html>
+
