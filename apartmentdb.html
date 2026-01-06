@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apartment Dashboard</title>
+    <style>
+:root {
+    --deep-teal: #1F3F3A;
+    --dark-charcoal: #1C1E1F;
+    --ivory: #F3EBDD;
+    --soft-beige: #E7DCC8;
+    --sage: #8FA6A0;
+    --blush: #F2D6CC;
+    --white: #FFFFFF;
+}
+
+
+body {
+    font-family: 'Georgia', serif;
+    margin: 0;
+    padding: 20px;
+    background: none; 
+    color: #000000; 
+    transition: all 0.3s ease;
+    position: relative; 
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('610204238_3877522732547055_1414562271256710166_n.png');
+    background-size: 100% 100%; 
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(5px); 
+    z-index: -1; 
+}
+
+body.calm-mode::before {
+    filter: blur(50px) brightness(0.96); 
+}
+
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+    background: var(--deep-teal);
+    color: var(--white);
+    padding: 18px;
+    border-radius: 20px;
+}
+
+
+.container {
+    display: flex;
+    gap: 20px;
+}
+
+.sidebar {
+    width: 250px;
+    background: transparent; 
+    color: var(--white);
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin: 10px 0;
+}
+
+.sidebar button {
+    width: 100%;
+    padding: 10px;
+    background: var(--sage);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.25s ease, transform 0.2s ease;
+}
+
+.sidebar button:hover,
+.sidebar button.active {
+    opacity: 0.85;
+    transform: translateY(-1px);
+    background: var(--ivory);
+    color: var(--deep-teal);
+}
+
+.main-content {
+    flex: 1;
+}
+
+
+section {
+    padding: 22px;
+    border-radius: 18px;
+    background: transparent; 
+    border: 1.5px solid var(--deep-teal);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    display: none; 
+}
+
+section.active {
+    display: block;
+}
+
+section:hover {
+    transform: translateY(-4px);
+    border-color: var(--sage);
+}
+
+
+button {
+    padding: 10px 18px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.25s ease, transform 0.2s ease;
+}
+
+button:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+button.accept { background: var(--deep-teal); color: var(--white); }
+button.reject { background: #7A2E2E; color: var(--white); }
+button.cancel { background: var(--sage); color: var(--white); }
+button.view   { background: var(--dark-charcoal); color: var(--white); }
+
+
+input, select, textarea {
+    padding: 9px;
+    margin: 10px 0;
+    border: 1px solid var(--sage);
+    border-radius: 6px;
+    background: var(--ivory);
+    color: #000000; 
+}
+
+
+#overview-chart {
+    width: 100%;
+    height: 110px;
+    background: linear-gradient(135deg, var(--deep-teal), var(--sage));
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-style: italic;
+}
+
+
+#tenant-list,
+#room-list,
+#archive-list {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid var(--deep-teal);
+    padding: 12px;
+    background: transparent; 
+    border-radius: 14px;
+}
+
+
+#notifications {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--deep-teal);
+    color: var(--white);
+    border-radius: 6px;
+    padding: 12px 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    display: none;
+}
+
+
+.resolved {
+    color: var(--sage);
+    font-weight: bold;
+}
+
+.status-item {
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--soft-beige);
+    border-left: 4px solid var(--deep-teal);
+}
+
+.status-item.warning {
+    border-left-color: #FFA500;
+}
+
+.status-item.error {
+    border-left-color: #FF0000;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Apartment Dashboard</h1>
+        <button class="cancel" id="calm-toggle">Toggle Calm Mode</button>
+    </header>
+    <div id="notifications">Action completed.</div>
+    <div class="container">
+        <aside class="sidebar">
+            <ul>
+                <li><button id="nav-overview">Dashboard Overview</button></li>
+                <li><button id="nav-room-management">Room Management</button></li>
+                <li><button id="nav-tenant-management">Tenant Management</button></li>
+                <li><button id="nav-rent-payments">Rent Payments</button></li>
+                <li><button id="nav-tenant-reports">Tenant Reports</button></li>
+                <li><button id="nav-archive">Archive</button></li>
+                <li><button id="nav-settings">Settings</button></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+            <section id="overview" class="active">
+                <h2>Dashboard Overview</h2>
+                <div class="status-item">Occupancy: 85%</div>
+                <div class="status-item">Total Revenue: $12,500</div>
+                <div class="status-item resolved">Pending Issues: 2 Resolved</div>
+                <div class="status-item">Maintenance Requests: 3 Pending</div>
+                <div class="status-item">Tenant Satisfaction: 92%</div>
+                <div class="status-item">Vacancy Rate: 15%</div>
+                <div class="status-item warning">Utilities Overdue: 1 Unit</div>
+                <div class="status-item">Average Rent Collection: 98%</div>
+                <div id="overview-chart">Chart Placeholder (Simulated)</div>
+            </section>
+            <section id="room-management">
+                <h2>Room Management</h2>
+                <div class="status-item">Total Rooms: 10 | Occupied: 8 | Vacant: 2</div>
+                <select id="room-select">
+                    <option>Room 101</option>
+                    <option>Room 102</option>
+                    <option>Room 201</option>
+                </select>
+                <input type="text" id="tenant-assign" placeholder="Tenant Name">
+                <button class="accept" id="assign-room">Assign Room</button>
+                <div id="room-list"></div>
+            </section>
+            <section id="tenant-management">
+                <h2>Tenant Management</h2>
+                <div class="status-item">Total Tenants: 8 | Active: 7 | Inactive: 1</div>
+                <input type="text" id="tenant-name" placeholder="Tenant Name">
+                <input type="email" id="tenant-email" placeholder="Email">
+                <button class="accept" id="add-tenant">Add Tenant</button>
+                <div id="tenant-list"></div>
+            </section>
+            <section id="rent-payments">
+                <h2>Rent Payments</h2>
+                <div class="status-item">Payments This Month: 95% Collected</div>
+                <select id="tenant-pay">
+                    <option>Select Tenant</option>
+                </select>
+                <input type="number" id="rent-amount" placeholder="Amount">
+                <button class="accept" id="process-payment">Process Payment</button>
+                <p id="payment-status"></p>
+            </section>
+            <section id="tenant-reports">
+                <h2>Tenant Reports</h2>
+                <div class="status-item">Reports Generated: 5 This Month</div>
+                <select id="report-tenant">
+                    <option>Select Tenant</option>
+                </select>
+                <button class="view" id="generate-report">Generate Report</button>
+                <div id="report-output"></div>
+            </section>
+            <section id="archive">
+                <h2>Archive</h2>
+                <div class="status-item">Archived Items: 12</div>
+                <input type="text" id="archive-item" placeholder="Item to Archive">
+                <button class="accept" id="archive-item-btn">Archive</button>
+                <div id="archive-list"></div>
+            </section>
+            <section id="settings">
+                <h2>Settings</h2>
+                <div class="status-item">Last Updated: Today</div>
+                <label><input type="checkbox" id="notif-toggle"> Enable Notifications</label><br>
+                <label><input type="checkbox" id="theme-toggle"> Dark Theme</label><br>
+                <button class="accept" id="save-settings">Save Settings</button>
+                <p id="settings-status"></p>
+            </section>
+        </main>
+    </div>
+    <script>
+        let tenants = [];
+        let rooms = { 'Room 101': null, 'Room 102': null, 'Room 201': null };
+        let archive = [];
+
+        
+        const navButtons = document.querySelectorAll('.sidebar button');
+        const sections = document.querySelectorAll('section');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                sections.forEach(sec => sec.classList.remove('active'));
+                
+                
+                button.classList.add('active');
+                const sectionId = button.id.replace('nav-', '');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+        
+        document.getElementById('nav-overview').classList.add('active');
+
+       
+        document.getElementById('calm-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('calm-mode');
+        });
+
+        
+        document.getElementById('assign-room').addEventListener('click', () => {
+            const room = document.getElementById('room-select').value;
+            const tenant = document.getElementById('tenant-assign').value;
+            if (tenant) {
+                rooms[room] = tenant;
+                updateRoomList();
+                document.getElementById('tenant-assign').value = '';
+            }
+        });
+        function updateRoomList() {
+            const list = document.getElementById('room-list');
+            list.innerHTML = Object.entries(rooms).map(([r, t]) => `<p>${r}: ${t || 'Vacant'}</p>`).join('');
+        }
+        updateRoomList();
+
+        
+        document.getElementById('add-tenant').addEventListener('click', () => {
+            const name = document.getElementById('tenant-name').value;
+            const email = document.getElementById('tenant-email').value;
+            if (name && email) {
+                tenants.push({ name, email });
+                updateTenantList();
+                updateTenantSelects();
+                document.getElementById('tenant-name').value = '';
+                document.getElementById('tenant-email').value = '';
+            }
+        });
+        function updateTenantList() {
+            const list = document.getElementById('tenant-list');
+            list.innerHTML = tenants.map(t => `<p>${t.name} (${t.email}) <button class="reject" onclick="removeTenant('${t.name}')">Remove</button></p>`).join('');
+        }
+        function removeTenant(name) {
+            tenants = tenants.filter(t => t.name !== name);
+            updateTenantList();
+            updateTenantSelects();
+        }
+        function updateTenantSelects() {
+            const selects = ['tenant-pay', 'report-tenant'];
+            selects.forEach(id => {
+                const sel = document.getElementById(id);
+                sel.innerHTML = '<option>Select Tenant</option>' + tenants.map(t => `<option>${t.name}</option>`).join('');
+            });
+        }
+
+        
+        document.getElementById('process-payment').addEventListener('click', () => {
+            const tenant = document.getElementById('tenant-pay').value;
+            const amount = document.getElementById('rent-amount').value;
+            if (tenant !== 'Select Tenant' && amount) {
+                document.getElementById('payment-status').textContent = `Payment of $${amount} processed for ${tenant}.`;
+                document.getElementById('rent-amount').value = '';
+            }
+        });
+
+        
+        document.getElementById('generate-report').addEventListener('click', () => {
+            const tenant = document.getElementById('report-tenant').value;
+            if (tenant !== 'Select Tenant') {
+                document.getElementById('report-output').innerHTML = `<p>Report for ${tenant}: <span class="resolved">Payments on time, no issues.</span></p>`;
+            }
+        });
+
+       
+        document.getElementById('archive-item-btn').addEventListener('click', () => {
+            const item = document.getElementById('archive-item').value;
+            if (item) {
+                archive.push(item);
+                updateArchiveList();
+                document.getElementById('archive-item').value = '';
+            }
+        });
+        function updateArchiveList() {
+            const list = document.getElementById('archive-list');
+            list.innerHTML = archive.map(i => `<p>${i}</p>`).join('');
+        }
+
+        
+        document.getElementById('save-settings').addEventListener('click', () => {
+            const notif = document.getElementById('notif-toggle').checked;
+            const theme = document.getElementById('theme-toggle').checked;
+            document.getElementById('settings-status').textContent = `Settings saved: Notifications ${notif ? 'On' : 'Off'}, Theme ${theme ? 'Dark' : 'Light'}.`;
+        });
+
+        
+        function showNotification(msg) {
+            const notif = document.getElementById('notifications');
+            notif.textContent = msg;
+            notif.style.display = 'block';
+            setTimeout(() => notif.style.display = 'none', 3000);
+        }
+    </script>
+</body>
+</html>
